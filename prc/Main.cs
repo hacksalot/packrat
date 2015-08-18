@@ -19,7 +19,7 @@ namespace prc
 
     public static void Main (string[] args) {
       Console.WriteLine( header );
-      packrat.pack( args );
+      (new packrat()).pack( args );
     }
 
   }

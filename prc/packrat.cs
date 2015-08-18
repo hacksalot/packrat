@@ -16,43 +16,64 @@ namespace prc {
   {
 
     // Pack 0..N images into the atlas
-    public static Image pack( string[] args ) {
+    public Image pack( string[] args ) {
 
-      if( args.Length != 2 )
+      // Handle params
+      if( args.Length != 3 )
         throw new ArgumentException();
+      _xu = _yu = int.Parse( args[2] );
 
       // Run the transformation(s)
-      int index = 0;
-      prImg atlas = (new glob( args[1] )).
-        Select( f => load( f, index++ ) ).
-        Concat( new [] { load( args[0], -1) } ).
-        OrderBy( i => i.id ).
-        Select( f => pre( f ) ).
-        OrderBy( i => i.id ).
-        Aggregate( (acc, inst) => merge( acc, inst ) );
+      var coll = (new glob(args[1]))
+        .Select(f => load( f ))
+        .OrderBy(f => f.id).ToList(); // take a deep breath
+      var atlas = coll
+        .Concat( new[] { prep(args[0]) } )
+        .Select(f => proc(f))
+        .OrderBy(i => i.id)
+        .Aggregate((acc, inst) => merge(acc, inst));
+
+      // Save and we're done
+      atlas.save( atlas.file );
       return atlas.raw;
     }
 
     // Load a source image file
-    static prImg load( string file, int index ) {
-      if( index != -1 )
-        Console.WriteLine("Loading texture #{0} ({1})", index, file);
-      var rep = index != 0 ? Image.FromFile( file ) : new Bitmap( file );
-      return new prImg( file, rep, index );
+    prImg load( string file ) {
+      Image img = Image.FromFile( file );
+      if( _count == 0 )
+          _texSize = img.Size;
+      else if( _texSize != img.Size )
+          throw new NotImplementedException();
+      return new prImg( file, img, _count++ );
     }
 
-    // Preprocess a source image file
-    static prImg pre( prImg org ) {
-      if( org.id != -1 )
-        Console.WriteLine("Processing #{0} ({1})", org.id, org.file);
+    // Process a source image file
+    prImg proc( prImg org ) {
       return org;
     }
 
+    // Prepare the atlas
+    prImg prep( string file ) {
+      var img = new Bitmap( Math.Min(_count, _xu) * _texSize.Width, 
+                            (1 + (_count / _xu)) * _texSize.Height );
+      _g = Graphics.FromImage( img );
+      return new prImg( file, img, -1 );
+    }
+
     // Add a processed image file to the atlas
-    static prImg merge( prImg acc, prImg inst ) {
-      Console.WriteLine("Merging {0} onto {1}", inst.file, acc.file);
+    prImg merge( prImg acc, prImg inst ) {
+      int w = inst.raw.Size.Width, h = inst.raw.Size.Height;
+      _g.DrawImage( inst.raw, (inst.id % _xu) * w, (inst.id / _yu) * h,
+                   new Rectangle( 0, 0, w, h ), GraphicsUnit.Pixel );
       return acc;
     }
+
+    int _xu = 0;    // horz tile count
+    int _yu = 0;    // vert tile count
+    int _count = 0; // # of tiles
+    Size _texSize;  // texture size in pixels
+    Graphics _g;    // Graphics object for atlas
 
   }
 
