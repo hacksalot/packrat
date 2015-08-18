@@ -26,12 +26,13 @@ namespace prc {
       // Run the transformation(s)
       var coll = (new glob(args[1]))
         .Select(f => load( f ))
-        .OrderBy(f => f.id).ToList(); // take a deep breath
-      var atlas = coll
-        .Concat( new[] { prep(args[0]) } )
+        .OrderBy(f => f.id)
         .Select(f => proc(f))
-        .OrderBy(i => i.id)
-        .Aggregate((acc, inst) => merge(acc, inst));
+        .ToList();
+
+      // Run the reduction
+      coll.Insert( 0, prep( args[0] ) );
+      var atlas = coll.Aggregate((acc, inst) => merge(acc, inst));
 
       // Save and we're done
       atlas.save( atlas.file );
@@ -71,17 +72,15 @@ namespace prc {
       _g.DrawImage( inst.raw, (inst.id % _xu) * w, (inst.id / _yu) * h,
                    new Rectangle( 0, 0, w, h ), GraphicsUnit.Pixel );
       if( Packed != null )
-        Packed( this, new ImageEventArgs(inst.id, inst.file) );
+        Packed( this, new ImageEventArgs( inst.id, inst.file ) );
       return acc;
     }
 
     // Event support
-    public delegate void LoadedEventHandler(object sender, ImageEventArgs e);
-    public delegate void ProcessedEventHandler(object sender, ImageEventArgs e);
-    public delegate void PackedEventHandler(object sender, ImageEventArgs e);
-    public event LoadedEventHandler Loaded;
-    public event ProcessedEventHandler Processed;
-    public event PackedEventHandler Packed;
+    public delegate void PackratEventHandler(object sender, ImageEventArgs e);
+    public event PackratEventHandler Loaded;
+    public event PackratEventHandler Processed;
+    public event PackratEventHandler Packed;
 
     int _xu = 0;    // horz tile count
     int _yu = 0;    // vert tile count
