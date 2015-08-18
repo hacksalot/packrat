@@ -11,6 +11,7 @@ namespace prc
 {
   class MainClass
   {
+    static bool _silent = false;
     const string header =
       "*******************************************\n" +
       "* packrat v0.1.0                          *\n" +
@@ -18,13 +19,30 @@ namespace prc
       "*******************************************\n";
 
     public static void Main (string[] args) {
-      Console.WriteLine( header );
-      (new packrat()).pack( args );
+
+      log( header );
+
+      var rat = new packrat();
+      rat.Loaded += ( s, e ) => log( "Loaded {0}: {1}", e.Index, fmt( e.File ) );
+      rat.Processed += ( s, e ) => log( "Processed {0}: {1}", e.Index, fmt( e.File ) );
+      rat.Packed += ( s, e ) => log( "Packed {0}: {1}", e.Index, fmt( e.File ) );
+      rat.pack( args );
 
       #if DEBUG
-      Console.WriteLine("Press any key to continue...");
+      log("Press any key to continue...");
       Console.ReadKey();
       #endif
+    }
+
+    static string fmt( string file ) {
+      int idx = file.LastIndexOfAny( new char[] { '/', '\\' } );
+      return idx > -1 ? file.Substring( idx + 1 ) : file;
+    }
+
+    static void log(string msg, params object[] parms) {
+      if( !_silent ) {
+        Console.WriteLine(msg, parms);
+      }
     }
 
   }
