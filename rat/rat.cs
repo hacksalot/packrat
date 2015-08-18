@@ -20,6 +20,11 @@ namespace prc
     public static void Main (string[] args) {
       Console.WriteLine( header );
       (new packrat()).pack( args );
+
+      #if DEBUG
+      Console.WriteLine("Press any key to continue...");
+      Console.ReadKey();
+      #endif
     }
 
   }
