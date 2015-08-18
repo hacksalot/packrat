@@ -1,5 +1,5 @@
 /**
- * MainClass.cs
+ * rat.cs
  * Application logic for packrat.
  * Copyright (c) 2015 | gruebait
  * License: MIT
@@ -12,26 +12,27 @@ namespace prc
   class MainClass
   {
     static bool _silent = false;
-    const string header =
-      "*******************************************\n" +
-      "* packrat v0.1.0                          *\n" +
-      "* Down 'n dirty texture atlas packing.    *\n" +
-      "*******************************************\n";
 
     public static void Main (string[] args) {
-
-      log( header );
-
-      var rat = new packrat();
-      rat.Loaded += ( s, e ) => log( "Loaded {0}: {1}", e.Index, fmt( e.File ) );
-      rat.Processed += ( s, e ) => log( "Processed {0}: {1}", e.Index, fmt( e.File ) );
-      rat.Packed += ( s, e ) => log( "Packed {0}: {1}", e.Index, fmt( e.File ) );
-      rat.pack( args );
-
+      try {
+        go( args );
+      }
+      catch( Exception ex ) {
+        log( pr.console.rat.msgError + ex.Message );
+      }
       #if DEBUG
-      log("Press any key to continue...");
+      Console.WriteLine(pr.console.rat.msgContinue);
       Console.ReadKey();
       #endif
+    }
+
+    static void go( string[] args ) {
+      log( String.Format( pr.console.rat.msgHeader, pr.console.rat.msgTitle, pr.console.rat.msgByline ) );
+      var rat = new packrat();
+      rat.Loaded += (s, e) => log( pr.console.rat.msgLoaded, e.Index, fmt(e.File) );
+      rat.Processed += (s, e) => log( pr.console.rat.msgProcessed, e.Index, fmt(e.File) );
+      rat.Packed += (s, e) => log( pr.console.rat.msgPacked, e.Index, fmt(e.File) );
+      rat.pack( args );
     }
 
     static string fmt( string file ) {
@@ -39,7 +40,7 @@ namespace prc
       return idx > -1 ? file.Substring( idx + 1 ) : file;
     }
 
-    static void log(string msg, params object[] parms) {
+    static void log( string msg, params object[] parms ) {
       if( !_silent ) {
         Console.WriteLine(msg, parms);
       }

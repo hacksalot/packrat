@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
 
-[assembly: AssemblyTitle("Packrat 0.1.0")]
+[assembly: AssemblyTitle("packrat 0.1.0")]
 [assembly: AssemblyDescription("Down 'n dirty texture atlas packing and creation.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
