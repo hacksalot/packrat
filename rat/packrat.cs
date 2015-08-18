@@ -45,11 +45,15 @@ namespace prc {
           _texSize = img.Size;
       else if( _texSize != img.Size )
           throw new NotImplementedException();
+      if( Loaded != null )
+        Loaded( this, new ImageEventArgs( _count, file ) );
       return new prImg( file, img, _count++ );
     }
 
     // Process a source image file
     prImg proc( prImg org ) {
+      if( Processed != null )
+        Processed( this, new ImageEventArgs( org.id, org.file ));
       return org;
     }
 
@@ -66,8 +70,18 @@ namespace prc {
       int w = inst.raw.Size.Width, h = inst.raw.Size.Height;
       _g.DrawImage( inst.raw, (inst.id % _xu) * w, (inst.id / _yu) * h,
                    new Rectangle( 0, 0, w, h ), GraphicsUnit.Pixel );
+      if( Packed != null )
+        Packed( this, new ImageEventArgs(inst.id, inst.file) );
       return acc;
     }
+
+    // Event support
+    public delegate void LoadedEventHandler(object sender, ImageEventArgs e);
+    public delegate void ProcessedEventHandler(object sender, ImageEventArgs e);
+    public delegate void PackedEventHandler(object sender, ImageEventArgs e);
+    public event LoadedEventHandler Loaded;
+    public event ProcessedEventHandler Processed;
+    public event PackedEventHandler Packed;
 
     int _xu = 0;    // horz tile count
     int _yu = 0;    // vert tile count
@@ -87,6 +101,15 @@ namespace prc {
     public string file { get; set; }
     public Image raw { get; set; }
     public int id { get; set; }
+  }
+
+  // Standard .NET event args
+  public class ImageEventArgs : EventArgs {
+    public ImageEventArgs( int index, string file ) {
+      Index = index; File = file;
+    }
+    public int Index { get; set; }
+    public string File { get; set; }
   }
 
 }
