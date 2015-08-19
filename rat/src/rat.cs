@@ -22,10 +22,10 @@ namespace prc
         go( args );
       }
       catch( Exception ex ) {
-        log( pr.console.rat.msgError + ex.Message );
+        log( str.error + ex.Message );
       }
       #if DEBUG
-      Console.WriteLine(pr.console.rat.msgContinue);
+      Console.WriteLine(rat.con.Properties.Resources.msgContinue);
       Console.ReadKey();
       #endif
     }
@@ -34,12 +34,12 @@ namespace prc
       packopts opts = new packopts();
       int argidx = 0;
       args.Select( a => arg(a, opts, args, argidx++) ).ToList();
-      log( String.Format( pr.console.rat.msgHeader, pr.console.rat.msgTitle, pr.console.rat.msgByline ) );
-      var rat = new packrat( opts );
-      rat.Loaded += (s, e) => log( pr.console.rat.msgLoaded, e.Index, fmt(e.File) );
-      rat.Processed += (s, e) => log( pr.console.rat.msgProcessed, e.Index, fmt(e.File) );
-      rat.Packed += (s, e) => log( pr.console.rat.msgPacked, e.Index, fmt(e.File) );
-      rat.pack();
+      log(String.Format( str.header, str.title, str.byline ));
+      var r = new packrat( opts );
+      r.Loaded += (s, e) => log( str.loaded, e.Index, fmt(e.File) );
+      r.Processed += (s, e) => log( str.proc, e.Index, fmt(e.File) );
+      r.Packed += (s, e) => log( str.packed , e.Index, fmt(e.File) );
+      r.pack();
     }
 
     static string arg( string a, packopts opts, string[] args, int idx ) {
@@ -71,6 +71,16 @@ namespace prc
       if( !_silent ) {
         Console.WriteLine(msg, parms);
       }
+    }
+
+    class str {
+      public static string error  = rat.con.Properties.Resources.msgError;
+      public static string header = rat.con.Properties.Resources.msgHeader;
+      public static string title  = rat.con.Properties.Resources.msgTitle;
+      public static string byline = rat.con.Properties.Resources.msgByline;
+      public static string loaded = rat.con.Properties.Resources.msgLoaded;
+      public static string proc   = rat.con.Properties.Resources.msgProcessed;
+      public static string packed = rat.con.Properties.Resources.msgPacked;
     }
 
   }
