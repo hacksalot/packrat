@@ -16,23 +16,22 @@ namespace prc {
   public class packrat
   {
 
-    // Pack 0..N images into the atlas
-    public Image pack( string[] args ) {
+    public packrat( packopts opts ) {
+      _opts = opts;
+    }
 
-      // Handle params
-      if( args.Length != 3 )
-        throw new ArgumentException();
-      _xu = _yu = int.Parse( args[2] );
+    // Pack 0..N images into the atlas
+    public Image pack() {
 
       // Run the transformation(s)
-      var coll = (new glob(args[1]))
+      var coll = (new glob( _opts.src ))
         .Select(f => load( f ))
         .OrderBy(f => f.id)
         .Select(f => proc(f))
         .ToList();
 
       // Run the reduction
-      coll.Insert( 0, prep( args[0] ) );
+      coll.Insert( 0, prep( _opts.dest ) );
       var atlas = coll.Aggregate((acc, inst) => merge(acc, inst));
 
       // Save and we're done
@@ -54,7 +53,7 @@ namespace prc {
 
     // Process a source image file
     prImg proc( prImg org ) {
-      if( _genMips ) {
+      if( _opts.mipCount != 0 ) {
         if (org.mips == null)
           org.mips = new List<Image>();
         for( int mipLevel = 1, // a modest for loop
@@ -68,7 +67,7 @@ namespace prc {
              h = org.mips[0].Height / f ) {
           Bitmap mipImg = new Bitmap( w, h );
           Graphics gtemp = Graphics.FromImage( mipImg );
-          gtemp.InterpolationMode = _mode;
+          gtemp.InterpolationMode = _opts.mode;
           gtemp.DrawImage( org.mips[0], new Rectangle( 0, 0, w, h ) );
           gtemp.Dispose();
           org.mips.Add( mipImg );
@@ -97,8 +96,8 @@ namespace prc {
 
     // Prepare the atlas
     prImg prep( string file ) {
-      var img = new Bitmap( Math.Min(_count, _xu) * _texSize.Width,
-                            (1 + (_count / _xu)) * _texSize.Height );
+      var img = new Bitmap( Math.Min(_count, _opts.magnitude.Width) * _texSize.Width,
+                            (1 + (_count / _opts.magnitude.Width)) * _texSize.Height );
       var pimg = new prImg( file, img, -1 );
       prepMips( pimg );
       return pimg;
@@ -108,8 +107,8 @@ namespace prc {
     Image copyMip( int mipLevel, prImg src, prImg dest ) {
       Graphics g = Graphics.FromImage( dest.mips[ mipLevel ] );
       int w = src.mips[ mipLevel ].Width, h = src.mips[ mipLevel ].Height;
-      g.InterpolationMode = _mode;
-      g.DrawImage( src.mips[ mipLevel ], (src.id % _xu) * w, (src.id / _xu) * h );
+      g.InterpolationMode = _opts.mode;
+      g.DrawImage( src.mips[ mipLevel ], (src.id % _opts.magnitude.Width) * w, (src.id / _opts.magnitude.Width) * h );
       g.Dispose();
       return src.mips[ mipLevel ];
     }
@@ -130,12 +129,9 @@ namespace prc {
     public event PackratEventHandler Processed;
     public event PackratEventHandler Packed;
 
-    int _xu = 0;    // horz tile count
-    int _yu = 0;    // vert tile count
     int _count = 0; // # of tiles
     Size _texSize;  // texture size in pixels
-    InterpolationMode _mode = InterpolationMode.Bilinear;
-    bool _genMips = true;
+    packopts _opts;
 
   }
 
@@ -168,6 +164,18 @@ namespace prc {
     }
     public int Index { get; set; }
     public string File { get; set; }
+  }
+
+  // And some options for the packer...
+  public class packopts {
+    public string src = "*.*";
+    public string dest = "atlas";
+    public int mipCount = -1;
+    public Size magnitude = new Size(1, 1);
+    public bool fourTap = false;
+    public int xu = 0;
+    public int yu = 0;
+    public InterpolationMode mode = InterpolationMode.Bilinear;
   }
 
 }
