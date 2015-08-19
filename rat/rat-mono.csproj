@@ -40,9 +40,9 @@
     <Compile Include="Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="src\Program.cs" />
     <Compile Include="src\glob.cs" />
     <Compile Include="src\packrat.cs" />
+    <Compile Include="src\Program.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
