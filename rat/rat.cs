@@ -7,6 +7,7 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 
 namespace prc
@@ -52,6 +53,7 @@ namespace prc
             case "-4tap": opts.fourTap = true; break;
             case "-tx": opts.magnitude.Width = int.Parse( args[idx + 1] ); break;
             case "-ty": opts.magnitude.Height = int.Parse( args[idx + 1] ); break;
+            case "-i": opts.mode = (InterpolationMode) Enum.Parse( opts.mode.GetType(), args[idx + 1], true ); break;
             default: break;
           }
           break;
