@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+  <data name="msgByline" xml:space="preserve">
+    <value>Down n dirty texture atlas packing.</value>
+  </data>  
+  <data name="msgContinue" xml:space="preserve">
+    <value>Press any key to continue...</value>
+  </data>
+  <data name="msgError" xml:space="preserve">
+    <value>ERROR: </value> 
+  </data> 
+  <data name="msgHeader" xml:space="preserve">
+    <value>********************************************
+{0}
+{1}
+********************************************</value>
+  </data>
+  <data name="msgLoaded" xml:space="preserve">
+    <value>Loaded {0}: {1}</value>
+  </data>
+  <data name="msgPacked" xml:space="preserve">
+    <value>Packed {0}: {1}</value>
+  </data>
+  <data name="msgProcessed" xml:space="preserve">
+    <value>Processed {0}: {1}</value>
+  </data>
+  <data name="msgTitle" xml:space="preserve">
+    <value>packrat 0.1.0</value>
+  </data>
+</root>

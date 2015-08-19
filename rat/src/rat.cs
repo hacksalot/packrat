@@ -25,7 +25,7 @@ namespace prc
         log( str.error + ex.Message );
       }
       #if DEBUG
-      Console.WriteLine(rat.con.Properties.Resources.msgContinue);
+			Console.WriteLine( str.cont );
       Console.ReadKey();
       #endif
     }
@@ -74,13 +74,14 @@ namespace prc
     }
 
     class str {
-      public static string error  = rat.con.Properties.Resources.msgError;
-      public static string header = rat.con.Properties.Resources.msgHeader;
-      public static string title  = rat.con.Properties.Resources.msgTitle;
-      public static string byline = rat.con.Properties.Resources.msgByline;
-      public static string loaded = rat.con.Properties.Resources.msgLoaded;
-      public static string proc   = rat.con.Properties.Resources.msgProcessed;
-      public static string packed = rat.con.Properties.Resources.msgPacked;
+      public static string error  = rat.con.Resources.msgError;
+	  public static string header = rat.con.Resources.msgHeader;
+	  public static string title  = rat.con.Resources.msgTitle;
+	  public static string cont   = rat.con.Resources.msgContinue;
+	  public static string byline = rat.con.Resources.msgByline;
+	  public static string loaded = rat.con.Resources.msgLoaded;
+	  public static string proc   = rat.con.Resources.msgProcessed;
+	  public static string packed = rat.con.Resources.msgPacked;
     }
 
   }
