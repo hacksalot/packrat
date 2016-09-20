@@ -1,7 +1,7 @@
 /**
  * glob.cs
  * Simple glob support for Mono / .NET.
- * Copyright (c) 2015 | gruebait
+ * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
 

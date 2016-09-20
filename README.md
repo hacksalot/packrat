@@ -22,9 +22,11 @@ A flexible, free, open-source texture atlas creation and packaging tool.
 ## Use
 
 From the shell:
-```bash
+
+```shell
 packrat ATLAS FILES [OPTIONS]
 ```
+
 Where `ATLAS` is the output atlas filename (without the extension), `FILES` is a wildcard or glob describing the texture files to pack, and `OPTIONS` describes any optional settings. For example:
 
 ```shell
@@ -45,4 +47,4 @@ packrat myatlas foo/*.png -s -tx 32 -i nearestneighbor
 
 ## License
 
-Licensed under MIT, have fun. Copyright &copy; 2015 by [**gruebait**](http://eatenbygrues.com) | All rights reseved.
+Licensed under MIT, have fun. Copyright &copy; 2015-16 by [hacksalot](http://github.com/hacksalot).

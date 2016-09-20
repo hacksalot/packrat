@@ -1,7 +1,7 @@
 /**
  * rat.cs
  * Application logic for packrat.
- * Copyright (c) 2015 | gruebait
+ * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
 
@@ -26,7 +26,7 @@ namespace rat.con
         log( str.error + ex.Message );
       }
       #if DEBUG
-			Console.WriteLine( str.cont );
+            Console.WriteLine( str.cont );
       Console.ReadKey();
       #endif
     }
@@ -76,13 +76,13 @@ namespace rat.con
 
     class str {
       public static string error  = rat.con.Resources.msgError;
-	    public static string header = rat.con.Resources.msgHeader;
-	    public static string title  = rat.con.Resources.msgTitle;
-	    public static string cont   = rat.con.Resources.msgContinue;
-	    public static string byline = rat.con.Resources.msgByline;
-	    public static string loaded = rat.con.Resources.msgLoaded;
-	    public static string proc   = rat.con.Resources.msgProcessed;
-	    public static string packed = rat.con.Resources.msgPacked;
+        public static string header = rat.con.Resources.msgHeader;
+        public static string title  = rat.con.Resources.msgTitle;
+        public static string cont   = rat.con.Resources.msgContinue;
+        public static string byline = rat.con.Resources.msgByline;
+        public static string loaded = rat.con.Resources.msgLoaded;
+        public static string proc   = rat.con.Resources.msgProcessed;
+        public static string packed = rat.con.Resources.msgPacked;
     }
 
   }

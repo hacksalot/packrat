@@ -1,7 +1,7 @@
 /**
  * packrat.cs
  * Core atlas assembly logic for the Packrat tool.
- * Copyright (c) 2015 | gruebait (gruebait@eatenbygrues.com)
+ * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
 
