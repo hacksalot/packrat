@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("gruebait (gruebait@eatenbygrues.com)")]
+[assembly: AssemblyCopyright("hacksalot (hacksalot@indevious.com)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

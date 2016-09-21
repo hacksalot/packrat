@@ -13,11 +13,11 @@ using System.Linq;
 
 namespace rat
 {
-  public class glob : IEnumerable< string >
+  public class Glob : IEnumerable< string >
   {
 
 
-    public glob( string path ) {
+    public Glob( string path ) {
       _paths = exp( path ).ToList();
     }
 

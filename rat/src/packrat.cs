@@ -13,48 +13,70 @@ using System.Collections.Generic;
 
 namespace rat {
 
-  public class packrat
-  {
 
-    public packrat( packopts opts ) {
+
+  public class Packrat {
+
+
+
+    /// <summary>
+    /// Construct a Packrat from user options.
+    /// </summary>
+    public Packrat( packopts opts ) {
       _opts = opts;
     }
 
-    // Pack 0..N images into the atlas
-    public Image pack() {
 
-      // Run the transformation(s)
-      var coll = (new glob( _opts.src ))
-        .Select(f => load( f ))
-        .OrderBy(f => f.id)
-        .Select(f => proc(f))
+
+    /// <summary>
+    /// Pack 1..N images into a mipmapped texture atlas.
+    /// </summary>
+    public Image Pack() {
+      
+      // Map: from raw file glob to list of loaded images
+      var coll = ( new Glob( _opts.src ) )
+        .Select( f => Load( f ) )
+        .OrderBy( f => f.id )
+        .Select( f => Proc(f) )
         .ToList();
+      
+      // Reduce: the collection of images to a single atlas
+      coll.Insert( 0, Prep( _opts.dest ) );
+      var atlas = coll.Aggregate( (acc, inst) => Merge(acc, inst) );
 
-      // Run the reduction
-      coll.Insert( 0, prep( _opts.dest ) );
-      var atlas = coll.Aggregate((acc, inst) => merge(acc, inst));
-
-      // Save and we're done
+      // Save & go home
       atlas.save( atlas.file );
-      return atlas.mips[0];
+      return atlas.mips[ 0 ];
     }
 
-    // Load a source image file
-    prImg load( string file ) {
+
+
+    /// <summary>
+    /// Load a source image file. Create Image and ImgEx objects.
+    /// Called for each un-globbed file in the input file list.
+    /// </summary>
+    ImgEx Load( string file ) {  //[interim]
       Image img = Image.FromFile( file );
       if( _count == 0 )
-          _texSize = img.Size;
+        _texSize = img.Size;
       else if( _texSize != img.Size )
-          throw new NotImplementedException();
+        _uniform = false;
       if( Loaded != null )
         Loaded( this, new ImageEventArgs( _count, file ) );
-      return new prImg( file, img, _count++ );
+      return new ImgEx( file, img, _count++ );
     }
 
-    // Process a source image file
-    prImg proc( prImg org ) {
+
+
+    /// <summary>
+    /// Process a source image file. Create mipmaps by downscaling
+    /// the original image by powers of 2 using the specified
+    /// interpolation mode. Called for each un-globbed file in the
+    /// input file list.
+    /// </summary>
+    ImgEx Proc( ImgEx org ){
       if( _opts.mipCount != 0 ) {
-        if (org.mips == null)
+        if( org.mips == null )
           org.mips = new List<Image>();
         for( int mipLevel = 1, // a modest for loop
              f = (int)Math.Pow(2,mipLevel),
@@ -64,7 +86,7 @@ namespace rat {
              mipLevel++,
              f = (int) Math.Pow(2, mipLevel),
              w = org.mips[0].Width / f,
-             h = org.mips[0].Height / f ) {
+             h = org.mips[0].Height / f ){
           Bitmap mipImg = new Bitmap( w, h );
           Graphics gtemp = Graphics.FromImage( mipImg );
           gtemp.InterpolationMode = _opts.mode;
@@ -78,9 +100,13 @@ namespace rat {
       return org;
     }
 
-    // Generate empty mipmaps for the image
-    void prepMips( prImg img ) {
-      for (int mipLevel = 1, // mega for-loop
+
+
+    /// <summary>
+    /// Generate empty mipmaps for the destination atlas.
+    /// </summary>
+    void PrepMips( ImgEx img ) {
+      for (int mipLevel = 1, // totally modest for-loop
            f = (int) Math.Pow( 2, mipLevel ),
            w = img.mips[0].Width / f,
            h = img.mips[0].Height / f;
@@ -94,70 +120,86 @@ namespace rat {
       }
     }
 
-    // Prepare the atlas
-    prImg prep( string file ) {
-      var img = new Bitmap( Math.Min(_count, _opts.magnitude.Width) * _texSize.Width,
-                            (1 + (_count / _opts.magnitude.Width)) * _texSize.Height );
-      var pimg = new prImg( file, img, -1 );
-      prepMips( pimg );
+
+
+    /// <summary>
+    /// Prepare the destination atlas.
+    /// </summary>
+    ImgEx Prep( string file ){
+      var sz = new Size( 
+        Math.Min(_count, _opts.magnitude.Width) * _texSize.Width,
+        (1 + (_count / _opts.magnitude.Width)) * _texSize.Height
+      );
+      _packer = new ImgPacker( sz );
+      var img = new Bitmap( sz.Width, sz.Height );
+      var pimg = new ImgEx( file, img, -1 );
+      PrepMips( pimg );
       return pimg;
     }
 
-    // Copy a specific mip-level from the source image to the atlas
-    Image copyMip( int mipLevel, prImg src, prImg dest ) {
+
+
+    /// <summary>
+    /// Copy a specific mip-level from a source image to the atlas.
+    /// </summary>
+    Image CopyMip( int mipLevel, ImgEx src, ImgEx dest, Point? destPos ) {
       Graphics g = Graphics.FromImage( dest.mips[ mipLevel ] );
       int w = src.mips[ mipLevel ].Width, h = src.mips[ mipLevel ].Height;
       g.InterpolationMode = _opts.mode;
-      g.DrawImage( src.mips[ mipLevel ], (src.id % _opts.magnitude.Width) * w, (src.id / _opts.magnitude.Width) * h );
+      Point pt = destPos.HasValue ? destPos.Value :
+        new Point((src.id % _opts.magnitude.Width) * w,
+                  (src.id / _opts.magnitude.Width) * h);
+      g.DrawImage( src.mips[ mipLevel ], pt );
       g.Dispose();
       return src.mips[ mipLevel ];
     }
 
-    // Add a processed image file to the atlas
-    prImg merge( prImg acc, prImg inst ) {
-      int mip = 0;
-      //inst.mips.Select(bmp => { return copyMip(mip++, inst, acc); });
-      foreach (Image bmp in inst.mips) { copyMip(mip++, inst, acc); }
+
+
+    /// <summary>
+    /// Add a processed image file to the atlas.
+    /// </summary>
+    /// <param name="acc">The accumulator. In this case, the atlas.</param>
+    /// <param name="inst">The instance. A specific image.</param>
+    ImgEx Merge( ImgEx acc, ImgEx inst ) {
+      if( !_uniform ){
+        Rectangle pos = _packer.Pack( inst );
+        if( !pos.IsEmpty )
+          CopyMip( 0, inst, acc, pos.Location );
+      }
+      else {
+        int mip = 0;
+        //inst.mips.Select(bmp => { return copyMip(mip++, inst, acc); });
+        foreach (Image bmp in inst.mips) { CopyMip( mip++, inst, acc, null ); }
+      }
       if( Packed != null )
         Packed( this, new ImageEventArgs( inst.id, inst.file ) );
       return acc;
     }
 
-    // Event support
+
+
+    // Event support...
     public delegate void PackratEventHandler(object sender, ImageEventArgs e);
     public event PackratEventHandler Loaded;
     public event PackratEventHandler Processed;
     public event PackratEventHandler Packed;
 
-    int _count = 0; // # of tiles
-    Size _texSize;  // texture size in pixels
-    packopts _opts;
 
+
+    // Private data...
+    int       _count = 0;       // Number of images
+    bool      _uniform = true;  // Textures uniformly sized?
+    Size      _texSize;         // Texture size in pixels
+    packopts  _opts;            // User-provided options
+    ImgPacker _packer;          // Our image packing tool.
   }
 
 
-  // Internal helper class for images / textures
-  class prImg {
-    public prImg( string path, Image org, int idx ) {
-      mips = new List<Image>();
-      file = path; mips.Add( org  ); id = idx;
-    }
-    public void save( string basePath ) {
-      for( int mip = 0; mip < mips.Count; mip++ ) {
-        saveMips( basePath, mip );
-      }
-    }
-    void saveMips( string basePath, int mipLevel ) {
-      string file = string.Format("{0}{1}.png",
-        basePath, mipLevel > 0 ? "-" + mipLevel.ToString() : "");
-      mips[ mipLevel ].Save( file );
-    }
-    public string file { get; set; }
-    public List<Image> mips { get; set; }
-    public int id { get; set; }
-  }
 
-  // Standard .NET event args
+  /// <summary>
+  /// Image-related event argument class.
+  /// </summary>
   public class ImageEventArgs : EventArgs {
     public ImageEventArgs( int index, string file ) {
       Index = index; File = file;
@@ -166,16 +208,22 @@ namespace rat {
     public string File { get; set; }
   }
 
-  // And some options for the packer...
+
+
+  /// <summary>
+  /// Packrat user options. Objectified from command line.
+  /// </summary>
   public class packopts {
-    public string src = "*.*";
-    public string dest = "atlas";
-    public int mipCount = -1;
-    public Size magnitude = new Size(1, 1);
-    public bool fourTap = false;
-    public int xu = 0;
-    public int yu = 0;
-    public InterpolationMode mode = InterpolationMode.Bilinear;
+    public string             src = "*.*";
+    public string             dest = "atlas";
+    public int                mipCount = -1;
+    public Size               magnitude = new Size(1, 1);
+    public bool               fourTap = false;
+    public int                xu = 0;
+    public int                yu = 0;
+    public InterpolationMode  mode = InterpolationMode.Bilinear;
   }
+
+
 
 }
