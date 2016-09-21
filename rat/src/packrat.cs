@@ -34,7 +34,7 @@ namespace rat {
     public Image Pack() {
       
       // Map: from raw file glob to list of loaded images
-      var coll = ( new Glob( _opts.src ) )
+      var coll = _opts.src.SelectMany( g => new Glob( g ) )
         .Select( f => Load( f ) )
         .OrderBy( f => f.id )
         .Select( f => Proc(f) )
@@ -214,7 +214,7 @@ namespace rat {
   /// Packrat user options. Objectified from command line.
   /// </summary>
   public class packopts {
-    public string             src = "*.*";
+    public List<string>       src = new List<string>();
     public string             dest = "atlas";
     public int                mipCount = -1;
     public Size               magnitude = new Size(1, 1);

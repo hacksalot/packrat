@@ -61,6 +61,15 @@ namespace rat.con {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The filename {0} is invalid..
+        /// </summary>
+        public static string mBadInput {
+            get {
+                return ResourceManager.GetString("mBadInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Down n dirty texture atlas packing..
         /// </summary>
         public static string mByline {
