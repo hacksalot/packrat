@@ -56,7 +56,8 @@ namespace rat {
     /// Called for each un-globbed file in the input file list.
     /// </summary>
     ImgEx Load( string file ) {  //[interim]
-      Image img = Image.FromFile( file );
+      Bitmap img = new Bitmap( file );
+      //Image img = Image.FromFile( file );
       if( _count == 0 )
         _texSize = img.Size;
       else if( _texSize != img.Size )
@@ -77,7 +78,7 @@ namespace rat {
     ImgEx Proc( ImgEx org ){
       if( _opts.mipCount != 0 ) {
         if( org.mips == null )
-          org.mips = new List<Image>();
+          org.mips = new List<Bitmap>();
         for( int mipLevel = 1, // a modest for loop
              f = (int)Math.Pow(2,mipLevel),
              w = org.mips[0].Width / f,
