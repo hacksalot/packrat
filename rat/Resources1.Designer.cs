@@ -155,6 +155,26 @@ namespace rat.con {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to # {0}
+        ///# {1}
+        ///#
+        ///# &lt;filename&gt;		&lt;atlas filename&gt;, &lt;atlas idx&gt;, &lt;atlas type&gt;, &lt;woffset&gt;, &lt;hoffset&gt;, &lt;depth offset&gt;, &lt;width&gt;, &lt;height&gt;
+        ///#
+        ///# Texture &lt;filename&gt; can be found in texture atlas &lt;atlas filename&gt;, i.e., 
+        ///# {0}&lt;idx&gt;.dds of &lt;atlas type&gt; type with texture coordinates boundary given by:
+        ///#   A = ( &lt;woffset&gt;, &lt;hoffset&gt; )
+        ///#   B = ( &lt;woffset&gt; + &lt;width&gt;, &lt;hoffset&gt; + &lt;height&gt; )
+        ///#
+        ///# where coordinates (0,0) and (1,1) of the original texture map correspond
+        ///# to coordinates A and B, respectively, in the tex [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string mTAIComment {
+            get {
+                return ResourceManager.GetString("mTAIComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to packrat 0.1.0.
         /// </summary>
         public static string mTitle {

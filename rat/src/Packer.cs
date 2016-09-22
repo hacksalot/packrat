@@ -42,7 +42,7 @@ namespace rat {
       
       // Reduce: the collection of images to a single atlas
       coll.Insert( 0, Prep( _opts.dest ) );
-      var atlas = coll.Aggregate( (acc, inst) => Merge(acc, inst) );
+      var atlas = coll.Aggregate( (a, i) => Merge(a, i) ) as ImgAtlas;
 
       // Save & go home
       atlas.Save( atlas.File );
@@ -126,16 +126,16 @@ namespace rat {
     /// <summary>
     /// Prepare the destination atlas.
     /// </summary>
-    ImgAsset Prep( string file ){
+    ImgAtlas Prep( string file ){
       var sz = new Size( 
         Math.Min(_count, _opts.magnitude.Width) * _texSize.Width,
         (1 + (_count / _opts.magnitude.Width)) * _texSize.Height
       );
       _packer = new Organizer( sz );
       var img = new Bitmap( sz.Width, sz.Height );
-      var pimg = new ImgAsset( file, img, -1 );
-      PrepMips( pimg );
-      return pimg;
+      var atlas = new ImgAtlas( file, img, -1 );
+      PrepMips( atlas );
+      return atlas;
     }
 
 
@@ -150,6 +150,7 @@ namespace rat {
       Point pt = destPos.HasValue ? destPos.Value :
         new Point((src.ID % _opts.magnitude.Width) * w,
                   (src.ID / _opts.magnitude.Width) * h);
+      src.Rect = new Rectangle( pt, src.Rect.Size );
       g.DrawImage( src.Mips[ mipLevel ], pt );
       g.Dispose();
       return src.Mips[ mipLevel ];
@@ -163,16 +164,18 @@ namespace rat {
     /// <param name="acc">The accumulator. In this case, the atlas.</param>
     /// <param name="inst">The instance. A specific image.</param>
     ImgAsset Merge( ImgAsset acc, ImgAsset inst ) {
+      ImgAtlas atlas = acc as ImgAtlas;
       if( !_uniform ){
         Rectangle pos = _packer.Pack( inst );
         if( !pos.IsEmpty )
-          CopyMip( 0, inst, acc, pos.Location );
+          CopyMip( 0, inst, atlas, pos.Location );
       }
       else {
         int mip = 0;
         //inst.mips.Select(bmp => { return copyMip(mip++, inst, acc); });
-        foreach (Image bmp in inst.Mips) { CopyMip( mip++, inst, acc, null ); }
+        foreach (Image bmp in inst.Mips) { CopyMip( mip++, inst, atlas, null ); }
       }
+      atlas.Add( inst );
       if( Packed != null )
         Packed( this, new ImageEventArgs( inst.ID, inst.File ) );
       return acc;

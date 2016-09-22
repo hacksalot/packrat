@@ -97,6 +97,9 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Include="src\ImgAtlas.cs" />
+    <Compile Include="src\DDSFileWriter.cs" />
+    <Compile Include="src\TAIFileWriter.cs" />
     <Compile Include="src\FileGlob.cs" />
     <Compile Include="src\ImgAsset.cs" />
     <Compile Include="src\Organizer.cs" />
@@ -104,7 +107,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\Program.cs" />
-    <Compile Include="src\Writer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

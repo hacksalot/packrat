@@ -151,6 +151,22 @@
   <data name="mProcessed" xml:space="preserve">
     <value>Processed {0}: {1}</value>
   </data>
+  <data name="mTAIComment" xml:space="preserve">
+    <value># {0}
+# {1}
+#
+# &lt;filename&gt;		&lt;atlas filename&gt;, &lt;atlas idx&gt;, &lt;atlas type&gt;, &lt;woffset&gt;, &lt;hoffset&gt;, &lt;depth offset&gt;, &lt;width&gt;, &lt;height&gt;
+#
+# Texture &lt;filename&gt; can be found in texture atlas &lt;atlas filename&gt;, i.e., 
+# {0}&lt;idx&gt;.dds of &lt;atlas type&gt; type with texture coordinates boundary given by:
+#   A = ( &lt;woffset&gt;, &lt;hoffset&gt; )
+#   B = ( &lt;woffset&gt; + &lt;width&gt;, &lt;hoffset&gt; + &lt;height&gt; )
+#
+# where coordinates (0,0) and (1,1) of the original texture map correspond
+# to coordinates A and B, respectively, in the texture atlas.
+# If the atlas is a volume texture then &lt;depth offset&gt; is the w-coordinate
+# to use the access the appropriate slice in the volume atlas.</value>
+  </data>
   <data name="mTitle" xml:space="preserve">
     <value>packrat 0.1.0</value>
   </data>

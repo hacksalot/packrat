@@ -41,7 +41,7 @@ namespace rat {
       var ic = new ImageComparer();
       System.Array.Sort( images, ic );
       for( int r = 0; r < images.Length; r++ ) {
-        if ( Rectangle.Empty == Pack(images[r]) ) break;
+        if ( Rectangle.Empty == Pack( images[r] ) ) break;
       }
     }
 
@@ -52,6 +52,8 @@ namespace rat {
     /// </summary>
     public Rectangle Pack( ImgAsset img ) {
       Node<ImgAsset> n = _root.Insert( img, img.Rect );
+      if (n != null)
+        img.Rect = n.rc;
       return n == null ? Rectangle.Empty : n.rc;
     }
 
@@ -103,7 +105,7 @@ namespace rat {
       }
     }
 
-    Size          _dims;
+    Size             _dims;
     Node<ImgAsset>   _root;
   }
 
