@@ -40,15 +40,14 @@ namespace rat
         MIPCount = (uint)images.Count(),
         PitchOrLinearSize = ( w * 32 + 7 ) / 8 //{1}
       };
-      FileStream fs = new FileStream( path, FileMode.Create );
-      BinaryWriter bw = new BinaryWriter( fs );
-      byte[] temp = hdr.Serialize();
-      bw.Write( temp );
-      foreach( Bitmap bmp in images ) {
-        bw.Write( GetImgData( bmp ) );
+      using (FileStream fs = new FileStream(path, FileMode.Create)) {
+        using (BinaryWriter bw = new BinaryWriter(fs)) { 
+          bw.Write( hdr.Serialize() );
+          foreach( Bitmap bmp in images ) {
+            bw.Write( GetImgData( bmp ) );
+          }
+        }
       }
-      bw.Close();
-      fs.Close();
     }
 
 
