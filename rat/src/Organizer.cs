@@ -1,6 +1,6 @@
 ﻿/**
- * ImgPacker.cs
- * Definition of the ImgPacker class.
+ * Organizer.cs
+ * Layout packing logic for Packrat.
  * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
@@ -14,18 +14,18 @@ namespace rat {
 
 
   /// <summary>
-  /// A simple image/texture packer based on a common "divide and
-  /// conquer" texture packing algorithm. Geometrically divide the
-  /// space with each added texture.
+  /// Organize the available space using a "divide and conquer"
+  /// bin-packing algorithm. Geometrically divide the space with
+  /// each added element.
   /// </summary>
-  public class ImgPacker {
+  public class Organizer {
 
 
 
     /// <summary>
-    /// Construct an image packer for a given atlas size.
+    /// Construct an organizer for a given atlas size.
     /// </summary>
-    public ImgPacker( Size dims ) {
+    public Organizer( Size dims ) {
       _dims = dims;
       _root = new Node<ImgEx>() {
         rc = new Rectangle( 0, 0, dims.Width, dims.Height )
@@ -73,7 +73,7 @@ namespace rat {
         if( !IsLeaf ) {
           Node<T> newNode = sub[0].Insert( thing, rcThing );
           if( newNode != null ) return newNode;
-          return sub[1].Insert(thing, rcThing);
+          return sub[1].Insert( thing, rcThing );
         }
         else { 
           if ( data != null ) return null;
@@ -88,11 +88,12 @@ namespace rat {
 
           float dw = rc.Width - rcThing.Width;
           float dh = rc.Height - rcThing.Height;
-          if( dw > dh ) {
+
+          if( dw > dh ) { // split horizontally
             sub[0].rc = new Rectangle( rc.Left, rc.Top, rcThing.Width, rc.Height );
             sub[1].rc = new Rectangle( rc.Left + rcThing.Width, rc.Top, rc.Width - rcThing.Width, rc.Height );
           }
-          else {
+          else {          // split vertically
             sub[0].rc = new Rectangle( rc.Left, rc.Top, rc.Width, rcThing.Height );
             sub[1].rc = new Rectangle( rc.Left, rc.Top + rcThing.Height, rc.Width, rc.Height - rcThing.Height );
           }

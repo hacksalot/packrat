@@ -1,5 +1,5 @@
 /**
- * glob.cs
+ * FileGlob.cs
  * Simple glob support for Mono / .NET.
  * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
@@ -13,11 +13,11 @@ using System.Linq;
 
 namespace rat
 {
-  public class Glob : IEnumerable< string >
+  public class FileGlob : IEnumerable< string >
   {
 
 
-    public Glob( string path ) {
+    public FileGlob( string path ) {
       _paths = exp( path ).ToList();
     }
 

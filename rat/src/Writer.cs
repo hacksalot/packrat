@@ -1,6 +1,6 @@
 ﻿/**
- * DDSWriter.cs
- * A simple class for writing .DDS (Direct Draw Surface) files with mipmaps.
+ * Writer.cs
+ * A utility class for writing .DDS (Direct Draw Surface) files with mipmaps.
  * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
@@ -23,7 +23,7 @@ namespace rat
   /// of mipmaps in an uncompressed ARGB format. This DDS file can be
   /// converted to DXT1, DXT3, etc., using a third-party tool like
   /// Compressonator or Unity.</remarks>
-  class DDSWriter
+  class Writer
   {
 
 
@@ -33,7 +33,7 @@ namespace rat
     /// <param name="h">Image height (of the biggest mipmap).</param>
     /// <param name="images">A collection containing the original image
     /// and its mipmaps, ordered from largest to smallest.</param>
-    public void Write( string path, uint w, uint h, IEnumerable<Bitmap> images )
+    public void WriteDDS( string path, uint w, uint h, IEnumerable<Bitmap> images )
     {
       DDSHeader hdr = new DDSHeader() {
         Width = w, Height = h,

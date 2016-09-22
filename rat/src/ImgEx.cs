@@ -1,6 +1,6 @@
 ﻿/**
- * ImgPacker.cs
- * Image packing logic for packrat. Pack, noble packing logic. Pack like the wind.
+ * ImgEx.cs
+ * Internal image-tracking class for Packrat. Interim code.
  * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
@@ -30,8 +30,8 @@ namespace rat {
       for( int mip = 0; mip < mips.Count; mip++ ) {
         saveMips( basePath, mip );
       }
-      DDSWriter dw = new DDSWriter();
-      dw.Write( basePath + ".dds", (uint)rc.Width, (uint)rc.Height, mips );
+      Writer dw = new Writer();
+      dw.WriteDDS( basePath + ".dds", (uint)rc.Width, (uint)rc.Height, mips );
     }
 
 

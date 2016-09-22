@@ -1,6 +1,6 @@
 /**
- * packrat.cs
- * Core atlas assembly logic for the Packrat tool.
+ * Packer.cs
+ * Atlas and spritesheet assembly logic for Packrat.
  * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
@@ -15,14 +15,14 @@ namespace rat {
 
 
 
-  public class Packrat {
+  public class Packer {
 
 
 
     /// <summary>
-    /// Construct a Packrat from user options.
+    /// Construct a Packer from user options.
     /// </summary>
-    public Packrat( packopts opts ) {
+    public Packer( packopts opts ) {
       _opts = opts;
     }
 
@@ -34,7 +34,7 @@ namespace rat {
     public Image Pack() {
       
       // Map: from raw file glob to list of loaded images
-      var coll = _opts.src.SelectMany( g => new Glob( g ) )
+      var coll = _opts.src.SelectMany( g => new FileGlob( g ) )
         .Select( f => Load( f ) )
         .OrderBy( f => f.id )
         .Select( f => Proc(f) )
@@ -131,7 +131,7 @@ namespace rat {
         Math.Min(_count, _opts.magnitude.Width) * _texSize.Width,
         (1 + (_count / _opts.magnitude.Width)) * _texSize.Height
       );
-      _packer = new ImgPacker( sz );
+      _packer = new Organizer( sz );
       var img = new Bitmap( sz.Width, sz.Height );
       var pimg = new ImgEx( file, img, -1 );
       PrepMips( pimg );
@@ -193,7 +193,7 @@ namespace rat {
     bool      _uniform = true;  // Textures uniformly sized?
     Size      _texSize;         // Texture size in pixels
     packopts  _opts;            // User-provided options
-    ImgPacker _packer;          // Our image packing tool.
+    Organizer _packer;          // Our image packing tool.
   }
 
 

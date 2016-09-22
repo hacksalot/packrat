@@ -97,12 +97,14 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Include="src\DDSWriter.cs" />
-    <Compile Include="src\glob.cs" />
+    <Compile Include="src\FileGlob.cs" />
     <Compile Include="src\ImgEx.cs" />
-    <Compile Include="src\ImgPacker.cs" />
-    <Compile Include="src\packrat.cs" />
+    <Compile Include="src\Organizer.cs" />
+    <Compile Include="src\Packer.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\Program.cs" />
+    <Compile Include="src\Writer.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

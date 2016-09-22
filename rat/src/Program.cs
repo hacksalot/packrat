@@ -1,6 +1,6 @@
 /**
- * rat.cs
- * Application logic for packrat.
+ * Program.cs
+ * Application logic for Packrat.
  * Copyright (c) 2015-16 | hacksalot <hacksalot@indevious.com>
  * License: MIT
  */
@@ -57,7 +57,7 @@ namespace rat.con {
       int argidx = 0;
       args.Select( a => Arg(a, opts, args, argidx++) ).ToList();
       // Build the atlas
-      var r = new Packrat( opts );
+      var r = new Packer( opts );
       r.Loaded += (s, e) => Log( str.loaded, e.Index, Fmt(e.File) );
       r.Processed += (s, e) => Log( str.proc, e.Index, Fmt(e.File) );
       r.Packed += (s, e) => Log( str.packed , e.Index, Fmt(e.File) );
@@ -79,7 +79,6 @@ namespace rat.con {
         case "-i": opts.mode = (InterpolationMode) Enum.Parse( opts.mode.GetType(), args[idx + 1], true ); _inArg = true; break;
         default:
           if( idx == 0 ) opts.dest = a;
-          //else if (!_inArg) opts.src.Add(Path.Combine(Directory.GetCurrentDirectory(), a));
           else if( !_inArg ) AddInputFile( a, opts );
           else _inArg = false;
           break;
