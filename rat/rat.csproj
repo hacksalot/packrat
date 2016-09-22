@@ -98,7 +98,7 @@
       <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="src\FileGlob.cs" />
-    <Compile Include="src\ImgEx.cs" />
+    <Compile Include="src\ImgAsset.cs" />
     <Compile Include="src\Organizer.cs" />
     <Compile Include="src\Packer.cs">
       <SubType>Code</SubType>

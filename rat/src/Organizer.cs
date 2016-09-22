@@ -27,7 +27,7 @@ namespace rat {
     /// </summary>
     public Organizer( Size dims ) {
       _dims = dims;
-      _root = new Node<ImgEx>() {
+      _root = new Node<ImgAsset>() {
         rc = new Rectangle( 0, 0, dims.Width, dims.Height )
       };
     }
@@ -37,7 +37,7 @@ namespace rat {
     /// <summary>
     /// Submit an array of images for packing.
     /// </summary>
-    public void Pack( ImgEx[] images ) {
+    public void Pack( ImgAsset[] images ) {
       var ic = new ImageComparer();
       System.Array.Sort( images, ic );
       for( int r = 0; r < images.Length; r++ ) {
@@ -50,8 +50,8 @@ namespace rat {
     /// <summary>
     /// Pack a single image.
     /// </summary>
-    public Rectangle Pack( ImgEx img ) {
-      Node<ImgEx> n = _root.Insert( img, img.rc );
+    public Rectangle Pack( ImgAsset img ) {
+      Node<ImgAsset> n = _root.Insert( img, img.Rect );
       return n == null ? Rectangle.Empty : n.rc;
     }
 
@@ -104,7 +104,7 @@ namespace rat {
     }
 
     Size          _dims;
-    Node<ImgEx>   _root;
+    Node<ImgAsset>   _root;
   }
 
 
@@ -115,8 +115,8 @@ namespace rat {
   /// </summary>
   public class ImageComparer : IComparer {
     public int Compare( object imgA, object imgB ) {
-      int aArea = ((ImgEx)imgA).rc.Width * ((ImgEx)imgA).rc.Height;
-      int bArea = ((ImgEx)imgB).rc.Width * ((ImgEx)imgB).rc.Height;
+      int aArea = ((ImgAsset)imgA).Rect.Width * ((ImgAsset)imgA).Rect.Height;
+      int bArea = ((ImgAsset)imgB).Rect.Width * ((ImgAsset)imgB).Rect.Height;
       if( aArea < bArea ) return -1;
       else if( bArea < aArea ) return 1;
       else return 0;

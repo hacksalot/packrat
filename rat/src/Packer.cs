@@ -36,7 +36,7 @@ namespace rat {
       // Map: from raw file glob to list of loaded images
       var coll = _opts.src.SelectMany( g => new FileGlob( g ) )
         .Select( f => Load( f ) )
-        .OrderBy( f => f.id )
+        .OrderBy( f => f.ID )
         .Select( f => Proc(f) )
         .ToList();
       
@@ -45,17 +45,17 @@ namespace rat {
       var atlas = coll.Aggregate( (acc, inst) => Merge(acc, inst) );
 
       // Save & go home
-      atlas.save( atlas.file );
-      return atlas.mips[ 0 ];
+      atlas.Save( atlas.File );
+      return atlas.Mips[ 0 ];
     }
 
 
 
     /// <summary>
-    /// Load a source image file. Create Image and ImgEx objects.
+    /// Load a source image file. Create Image and ImgAsset objects.
     /// Called for each un-globbed file in the input file list.
     /// </summary>
-    ImgEx Load( string file ) {  //[interim]
+    ImgAsset Load( string file ) {  //[interim]
       Bitmap img = new Bitmap( file );
       //Image img = Image.FromFile( file );
       if( _count == 0 )
@@ -64,7 +64,7 @@ namespace rat {
         _uniform = false;
       if( Loaded != null )
         Loaded( this, new ImageEventArgs( _count, file ) );
-      return new ImgEx( file, img, _count++ );
+      return new ImgAsset( file, img, _count++ );
     }
 
 
@@ -75,29 +75,29 @@ namespace rat {
     /// interpolation mode. Called for each un-globbed file in the
     /// input file list.
     /// </summary>
-    ImgEx Proc( ImgEx org ){
+    ImgAsset Proc( ImgAsset org ){
       if( _opts.mipCount != 0 ) {
-        if( org.mips == null )
-          org.mips = new List<Bitmap>();
+        if( org.Mips == null )
+          org.Mips = new List<Bitmap>();
         for( int mipLevel = 1, // a modest for loop
              f = (int)Math.Pow(2,mipLevel),
-             w = org.mips[0].Width / f,
-             h = org.mips[0].Height / f;
+             w = org.Mips[0].Width / f,
+             h = org.Mips[0].Height / f;
              w != 0 && h != 0;
              mipLevel++,
              f = (int) Math.Pow(2, mipLevel),
-             w = org.mips[0].Width / f,
-             h = org.mips[0].Height / f ){
+             w = org.Mips[0].Width / f,
+             h = org.Mips[0].Height / f ){
           Bitmap mipImg = new Bitmap( w, h );
           Graphics gtemp = Graphics.FromImage( mipImg );
           gtemp.InterpolationMode = _opts.mode;
-          gtemp.DrawImage( org.mips[0], new Rectangle( 0, 0, w, h ) );
+          gtemp.DrawImage( org.Mips[0], new Rectangle( 0, 0, w, h ) );
           gtemp.Dispose();
-          org.mips.Add( mipImg );
+          org.Mips.Add( mipImg );
         }
       }
       if( Processed != null )
-        Processed( this, new ImageEventArgs( org.id, org.file ));
+        Processed( this, new ImageEventArgs( org.ID, org.File ));
       return org;
     }
 
@@ -106,18 +106,18 @@ namespace rat {
     /// <summary>
     /// Generate empty mipmaps for the destination atlas.
     /// </summary>
-    void PrepMips( ImgEx img ) {
+    void PrepMips( ImgAsset img ) {
       for (int mipLevel = 1, // totally modest for-loop
            f = (int) Math.Pow( 2, mipLevel ),
-           w = img.mips[0].Width / f,
-           h = img.mips[0].Height / f;
+           w = img.Mips[0].Width / f,
+           h = img.Mips[0].Height / f;
            w != 0 && h != 0;
            mipLevel++,
            f = (int) Math.Pow( 2, mipLevel ),
-           w = img.mips[0].Width / f,
-           h = img.mips[0].Height / f) {
+           w = img.Mips[0].Width / f,
+           h = img.Mips[0].Height / f) {
         Bitmap mipImg = new Bitmap( w, h );
-        img.mips.Add( mipImg );
+        img.Mips.Add( mipImg );
       }
     }
 
@@ -126,14 +126,14 @@ namespace rat {
     /// <summary>
     /// Prepare the destination atlas.
     /// </summary>
-    ImgEx Prep( string file ){
+    ImgAsset Prep( string file ){
       var sz = new Size( 
         Math.Min(_count, _opts.magnitude.Width) * _texSize.Width,
         (1 + (_count / _opts.magnitude.Width)) * _texSize.Height
       );
       _packer = new Organizer( sz );
       var img = new Bitmap( sz.Width, sz.Height );
-      var pimg = new ImgEx( file, img, -1 );
+      var pimg = new ImgAsset( file, img, -1 );
       PrepMips( pimg );
       return pimg;
     }
@@ -143,16 +143,16 @@ namespace rat {
     /// <summary>
     /// Copy a specific mip-level from a source image to the atlas.
     /// </summary>
-    Image CopyMip( int mipLevel, ImgEx src, ImgEx dest, Point? destPos ) {
-      Graphics g = Graphics.FromImage( dest.mips[ mipLevel ] );
-      int w = src.mips[ mipLevel ].Width, h = src.mips[ mipLevel ].Height;
+    Image CopyMip( int mipLevel, ImgAsset src, ImgAsset dest, Point? destPos ) {
+      Graphics g = Graphics.FromImage( dest.Mips[ mipLevel ] );
+      int w = src.Mips[ mipLevel ].Width, h = src.Mips[ mipLevel ].Height;
       g.InterpolationMode = _opts.mode;
       Point pt = destPos.HasValue ? destPos.Value :
-        new Point((src.id % _opts.magnitude.Width) * w,
-                  (src.id / _opts.magnitude.Width) * h);
-      g.DrawImage( src.mips[ mipLevel ], pt );
+        new Point((src.ID % _opts.magnitude.Width) * w,
+                  (src.ID / _opts.magnitude.Width) * h);
+      g.DrawImage( src.Mips[ mipLevel ], pt );
       g.Dispose();
-      return src.mips[ mipLevel ];
+      return src.Mips[ mipLevel ];
     }
 
 
@@ -162,7 +162,7 @@ namespace rat {
     /// </summary>
     /// <param name="acc">The accumulator. In this case, the atlas.</param>
     /// <param name="inst">The instance. A specific image.</param>
-    ImgEx Merge( ImgEx acc, ImgEx inst ) {
+    ImgAsset Merge( ImgAsset acc, ImgAsset inst ) {
       if( !_uniform ){
         Rectangle pos = _packer.Pack( inst );
         if( !pos.IsEmpty )
@@ -171,10 +171,10 @@ namespace rat {
       else {
         int mip = 0;
         //inst.mips.Select(bmp => { return copyMip(mip++, inst, acc); });
-        foreach (Image bmp in inst.mips) { CopyMip( mip++, inst, acc, null ); }
+        foreach (Image bmp in inst.Mips) { CopyMip( mip++, inst, acc, null ); }
       }
       if( Packed != null )
-        Packed( this, new ImageEventArgs( inst.id, inst.file ) );
+        Packed( this, new ImageEventArgs( inst.ID, inst.File ) );
       return acc;
     }
 
