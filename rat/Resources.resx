@@ -145,6 +145,9 @@
   <data name="mMissingInput" xml:space="preserve">
     <value>You must specify one or more images to pack.</value>
   </data>
+  <data name="mNonP2" xml:space="preserve">
+    <value>Input file "{0}" is not a power-of-two texture.</value>
+  </data>
   <data name="mPacked" xml:space="preserve">
     <value>Packed {0}: {1}</value>
   </data>

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Collections.Generic;
+using System.IO;
 
 namespace rat {
 
@@ -34,8 +35,10 @@ namespace rat {
     public Image Pack() {
       
       // Map: from raw file glob to list of loaded images
-      var coll = _opts.src.SelectMany( g => new FileGlob( g ) )
+      var coll = _opts.src
+        .SelectMany( g => Expand(g) )
         .Select( f => Load( f ) )
+        .Where( f => f.Status == AssetErrorState.Success )
         .OrderBy( f => f.ID )
         .Select( f => Proc(f) )
         .ToList();
@@ -51,20 +54,40 @@ namespace rat {
 
 
 
+    IEnumerable<string> Expand( string path ) {
+      if( path.Contains('*') || path.Contains('?') ) {
+        return new FileGlob( path );
+      }
+      else {
+        return new string[] { path };
+      }
+    }
+
+
+
     /// <summary>
     /// Load a source image file. Create Image and ImgAsset objects.
-    /// Called for each un-globbed file in the input file list.
+    /// Called for each un-globbed/expanded file in the input file list.
     /// </summary>
-    ImgAsset Load( string file ) {  //[interim]
-      Bitmap img = new Bitmap( file );
-      //Image img = Image.FromFile( file );
-      if( _count == 0 )
-        _texSize = img.Size;
-      else if( _texSize != img.Size )
-        _uniform = false;
+    ImgAsset Load( string file ) {
+      ImgAsset ret = null;
+      // Load the file into an image + asset object
+      if( File.Exists( file )) {
+        Bitmap img = new Bitmap(file);
+        ret = new ImgAsset( file, img, _count );
+        // Infer: are all textures the same size?
+        if (_count++ == 0)
+          _texSize = img.Size;
+        else if (_texSize != img.Size)
+          _uniform = false;
+      }
+      else {
+        ret = new ImgAsset( file, AssetErrorState.FileMissing );
+      }
+      // Fire the Loaded event
       if( Loaded != null )
-        Loaded( this, new ImageEventArgs( _count, file ) );
-      return new ImgAsset( file, img, _count++ );
+        Loaded( this, new ImageEventArgs( ret ) );
+      return ret;
     }
 
 
@@ -97,7 +120,7 @@ namespace rat {
         }
       }
       if( Processed != null )
-        Processed( this, new ImageEventArgs( org.ID, org.File ));
+        Processed( this, new ImageEventArgs( org ));
       return org;
     }
 
@@ -167,8 +190,14 @@ namespace rat {
       ImgAtlas atlas = acc as ImgAtlas;
       if( !_uniform ){
         Rectangle pos = _packer.Pack( inst );
-        if( !pos.IsEmpty )
-          CopyMip( 0, inst, atlas, pos.Location );
+        if( !pos.IsEmpty ){
+          int mip = 0;
+          foreach (Image bmp in inst.Mips) {
+            int pw = (int) Math.Pow(2.0, mip);
+            Point pt = new Point(pos.Location.X / pw, pos.Location.Y / pw);
+            CopyMip( mip++, inst, atlas, pt );
+          }
+        }
       }
       else {
         int mip = 0;
@@ -177,7 +206,7 @@ namespace rat {
       }
       atlas.Add( inst );
       if( Packed != null )
-        Packed( this, new ImageEventArgs( inst.ID, inst.File ) );
+        Packed( this, new ImageEventArgs( inst ) );
       return acc;
     }
 
@@ -205,11 +234,10 @@ namespace rat {
   /// Image-related event argument class.
   /// </summary>
   public class ImageEventArgs : EventArgs {
-    public ImageEventArgs( int index, string file ) {
-      Index = index; File = file;
+    public ImageEventArgs( ImgAsset img ) {
+      Image = img;
     }
-    public int Index { get; set; }
-    public string File { get; set; }
+    public ImgAsset Image { get; set; }
   }
 
 

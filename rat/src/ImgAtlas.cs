@@ -22,7 +22,7 @@ namespace rat
     }
 
     public void Add( ImgAsset asset ) {
-      Children.Add( asset.Moniker, asset );
+      Children.Add( asset );
     }
 
     public void Save( string basePath ) {
@@ -32,10 +32,9 @@ namespace rat
       DDSFileWriter dw = new DDSFileWriter();
       dw.Write( basePath + ".dds", (uint)Rect.Width, (uint)Rect.Height, Mips );
       TAIFileWriter tw = new TAIFileWriter();
-      tw.Write( basePath + ".tai", this, Children.Values );
+      tw.Write( basePath + ".tai", this, Children );
     }
 
-    Dictionary<string, ImgAsset> Children 
-      = new Dictionary<string, ImgAsset>();
+    List<ImgAsset> Children = new List<ImgAsset>();
   }
 }

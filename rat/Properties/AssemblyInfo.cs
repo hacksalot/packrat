@@ -15,7 +15,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("Down 'n dirty texture atlas packing and creation.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("Packrat")]
 [assembly: AssemblyCopyright("hacksalot (hacksalot@indevious.com)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

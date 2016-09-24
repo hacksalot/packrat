@@ -137,6 +137,15 @@ namespace rat.con {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Input file &quot;{0}&quot; is not a power-of-two texture..
+        /// </summary>
+        public static string mNonP2 {
+            get {
+                return ResourceManager.GetString("mNonP2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Packed {0}: {1}.
         /// </summary>
         public static string mPacked {

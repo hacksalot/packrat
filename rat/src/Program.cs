@@ -11,13 +11,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.IO;
-using rat;
-
-namespace rat.con {
 
 
+namespace rat {
 
-  class MainClass {
+
+
+  public class MainClass {
     
 
 
@@ -58,9 +58,9 @@ namespace rat.con {
       args.Select( a => Arg(a, opts, args, argidx++) ).ToList();
       // Build the atlas
       var r = new Packer( opts );
-      r.Loaded += (s, e) => Log( str.loaded, e.Index, Fmt(e.File) );
-      r.Processed += (s, e) => Log( str.proc, e.Index, Fmt(e.File) );
-      r.Packed += (s, e) => Log( str.packed , e.Index, Fmt(e.File) );
+      r.Loaded += (s, e) => Handle( 0, e.Image );
+      r.Processed += (s, e) => Handle( 1, e.Image );
+      r.Packed += (s, e) => Handle( 2, e.Image );
       r.Pack();
     }
 
@@ -115,8 +115,34 @@ namespace rat.con {
     /// <summary>
     /// Log a message to the console, respecting the "silent" flag.
     /// </summary>
-    static void Log( string msg, params object[] parms ) {
+    public static void Log( string msg, params object[] parms ) {
       if( !_silent ) { Console.WriteLine(msg, parms); }
+    }
+
+
+
+    /// <summary>
+    /// Handle events from the image packer.
+    /// </summary>
+    public static void Handle( int type, ImgAsset img ) {
+      switch( type ) {
+        case 0:
+          if( img.Status != AssetErrorState.Success )
+            Console.ForegroundColor = ConsoleColor.Red;
+          else if( !img.IsPowerOfTwo )
+            Console.ForegroundColor = ConsoleColor.Yellow;
+          else
+            Console.ForegroundColor = ConsoleColor.Green;
+          Log( "Loaded: {0,-30}  {1}x{2}", img.Moniker, img.Rect.Width, img.Rect.Height );
+          if( !img.IsPowerOfTwo ){
+            Log( rat.con.Resources.mNonP2, img.File );
+          }
+          break;
+        case 1:
+          break;
+        case 2:
+          break;
+      }
     }
 
 
